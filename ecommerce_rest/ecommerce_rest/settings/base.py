@@ -39,11 +39,11 @@ THIRD_APPS = [
     # 'automatic_crud',
     'rest_framework',
     'corsheaders',
-    #'rest_framework.authtoken',
+    'rest_framework.authtoken',
     # 'rest_framework_simplejwt',  
     # 'rest_framework_simplejwt.token_blacklist',  
     'simple_history',
-    # 'drf_yasg',
+    'drf_yasg',
 ]
 
 INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
@@ -62,6 +62,8 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.IsAuthenticated',
     )
 }
+
+TOKEN_EXPIRED_AFTER_SECONDS = 10
 
 MIDDLEWARE = [    
     'django.middleware.security.SecurityMiddleware',
