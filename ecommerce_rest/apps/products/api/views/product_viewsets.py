@@ -2,6 +2,7 @@ from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 
 from apps.base.api import GeneralListApiView
+from apps.users.authentication_mixins import Authentication
 from apps.products.api.serializers.product_serializers import ProductSerializer
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
@@ -47,7 +48,7 @@ class ProductRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
         
         return Response({'error' : 'no existe un producto con estos datos'}, status=status.HTTP_400_BAD_REQUEST)
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductViewSet(Authentication, viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     # queryset = ProductSerializer.Meta.model.objects.filter(state=True)
 

@@ -9,6 +9,8 @@ from rest_framework.exceptions import AuthenticationFailed
 
 
 class ExpiringTokenAuthentication(TokenAuthentication):
+    expired = False
+    
     def expires_in(self,token):
         # return left time of token
         time_elapsed = timezone.now() - token.created
@@ -20,32 +22,30 @@ class ExpiringTokenAuthentication(TokenAuthentication):
         return self.expires_in(token) < timedelta(seconds = 0)
 
     def token_expire_handler(self,token):
-        """
-    Return:
-        * is_expire     : True if token is alive, False if token is expired
-        * token         : New token or actual token
-    """
-    is_expire = self.is_token_expired(token)
-    if is_expire:
-        user = token.user
-        token.delete()
-        token = self.get_model().objects.create(user=user)
-    
-    return toke
+        is_expire = self.is_token_expired(token)
+        if is_expire:
+            self.expired = True
+            user = token.user
+            token.delete()
+            token = self.get_model().objects.create(user=user)
+            print('token expirado')
+        return is_expire,token
 
     def authenticate_credentials(self, key):
+        message,token,user = None,None, None
         try:
             token = self.get_model().objects.select_related('user').get(key=key)
+            user = token.user
+        except self.get_model().DoesNotExist: 
+            message = 'Invalid token'
+            self.expired = True
 
-        except : 
-            self.get_model().DoesNotExist
-            raise AuthenticationFailed('token invalido')
-        
-        if not token.user.is_active:
-            raise AuthenticationFailed('user inactive or deleted')
+        if token is not None:
+            if not token.user.is_active:
+                message = 'user inactive or deleted'            
 
-        is_expired = self.token_expire_handler(token)
-        if is_expired:
-            raise AuthenticationFailed('Su token ha expirado')
+            is_expired = self.token_expire_handler(token)
+            if is_expired:
+                message = 'token expired'
         
-        return (token.user, token)
+        return (user, token, message, self.expired)
