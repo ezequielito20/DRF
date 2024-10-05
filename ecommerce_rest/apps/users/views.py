@@ -8,24 +8,23 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 
+from apps.users.authentication_mixins import Authentication
 from apps.users.api.serializers import UserTokenSerializer
 
-class UserToken(APIView):
+class UserToken(Authentication, APIView):
     def get(self, request, *args, **kwargs):
-        username = request.GET.get('username')
-        print(username)
-        
         try:
-            user_token = Token.objects.get(user=UserTokenSerializer().Meta.model.objects.filter(username= username).first())
+            user_token,_ = Token.objects.get_or_create(self.user)
+            user = UserTokenSerializer(self.user)
             return Response({
-                'token': user_token.key
+                'token': user_token.key,
+                'user': user.data,
             },status=status.HTTP_201_CREATED)
         except:
             return Response({
                 'error': 'User not found'
             },status=status.HTTP_400_BAD_REQUEST)
-        
-        
+
 
 class Login(ObtainAuthToken):
     def post(self, request, *args, **kwargs):

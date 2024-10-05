@@ -31,7 +31,7 @@ urlpatterns = [
     # path('productos/', include('apps.products.api.urls')),
     path('productos/', include('apps.products.api.routers')),
 
-    path('',Login.as_view(), name='Login'),
+    path('login/',Login.as_view(), name='Login'),
     path('logout/',Logout.as_view(), name='Logout'),
     path('refresh-token/',UserToken.as_view(), name='Refresh_token'),
     
