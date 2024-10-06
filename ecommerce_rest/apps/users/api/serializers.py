@@ -1,11 +1,19 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from apps.users.models import User
 
-class UserTokenSerializer(serializers.ModelSerializer):
+# class UserTokenSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('username', 'email', 'name', 'last_name' )
+
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'name', 'last_name' )
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    pass
 
 class UserSerializer(serializers.ModelSerializer):
     # cuando quieres registrar o actualizar
@@ -20,39 +28,35 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-    def update(self,instance, validate_data):
-        update_user = super().update(instance,validated_data)
-        update_user.set_password(validate_data['password'])
-        update_user.save()
-        return update_user
-
-
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    # print(instance)
-    # print(representation)
-
-    # return {
-    #     'id': representation['id'],
-    #     'username': representation['username'],
-    #     'email': representation['email'],
-
-    #     }
-    
-
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ( 'username', 'email', 'name', 'last_name' )
+   
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields = ['id', 'username', 'email', 'name'] 
 
     def to_representation(self, instance):
+        representation = super().to_representation(instance)
         return {
             'id': representation['id'],
+            'name': representation['name'],
             'username': representation['username'],
             'email': representation['email'],
-            'password': representation['password'],
+            # 'password': representation['password'],
         }
 
-
+class PasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+    password2 = serializers.CharField(max_length=128, min_length=8, write_only=True)
+    
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError('Las contraseñas no coinciden')
+        return data
+    
 
 class TestUserSerializer(serializers.Serializer):
     name = serializers.CharField(max_length = 200)

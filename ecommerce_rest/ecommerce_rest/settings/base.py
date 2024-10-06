@@ -40,8 +40,8 @@ THIRD_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework.authtoken',
-    # 'rest_framework_simplejwt',  
-    # 'rest_framework_simplejwt.token_blacklist',  
+    'rest_framework_simplejwt',  
+    'rest_framework_simplejwt.token_blacklist',  
     'simple_history',
     'drf_yasg',
 ]
@@ -55,15 +55,18 @@ SWAGGER_SETTINGS = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'apps.users.authentication_mixins.Authentication',
+        
     ],
     'DEFAULT_PERMISSION_CLASSES': (
-        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
+        
     )
 }
 
-TOKEN_EXPIRED_AFTER_SECONDS = 900
+# TOKEN_EXPIRED_AFTER_SECONDS = 900
 
 MIDDLEWARE = [    
     'django.middleware.security.SecurityMiddleware',
